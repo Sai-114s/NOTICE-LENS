@@ -252,7 +252,10 @@ export const AdminDashboard = ({ onNavigate }) => {
               const isDownloading = downloadingId === notice.id;
 
               return (
-                <article key={notice.id} className="admin-notice-roster-card">
+                <article
+                  key={notice.id}
+                  className={`admin-notice-roster-card ${eligibleStudents.length === 0 ? 'no-eligible' : ''}`}
+                >
                   <div className="admin-notice-card-top">
                     <div className="admin-notice-main-meta">
                       <div className="admin-org-tag">
@@ -356,36 +359,38 @@ export const AdminDashboard = ({ onNavigate }) => {
                           No students in the enrolled cohort currently meet the deterministic criteria for this notice.
                         </p>
                       ) : (
-                        <table className="admin-students-table">
-                          <thead>
-                            <tr>
-                              <th>Student Name</th>
-                              <th>Department</th>
-                              <th>Academic Year</th>
-                              <th>Current CGPA</th>
-                              <th>Active Backlogs</th>
-                              <th>Status</th>
-                              <th>Evaluation Rule Match</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {eligibleStudents.map((student) => (
-                              <tr key={student.studentId || student.student}>
-                                <td style={{ fontWeight: 600 }}>{student.student}</td>
-                                <td>{student.branch || 'N/A'}</td>
-                                <td>Year {student.year || 'N/A'}</td>
-                                <td style={{ fontWeight: 600 }}>{student.cgpa ?? 'N/A'}</td>
-                                <td>{student.active_backlogs ?? 0}</td>
-                                <td>
-                                  <span className="admin-table-eligible-badge">Eligible</span>
-                                </td>
-                                <td style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
-                                  {student.reason}
-                                </td>
+                        <div className="admin-students-table-container">
+                          <table className="admin-students-table">
+                            <thead>
+                              <tr>
+                                <th>Student Name</th>
+                                <th>Department</th>
+                                <th>Academic Year</th>
+                                <th>Current CGPA</th>
+                                <th>Active Backlogs</th>
+                                <th>Status</th>
+                                <th>Evaluation Rule Match</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {eligibleStudents.map((student) => (
+                                <tr key={student.studentId || student.student}>
+                                  <td style={{ fontWeight: 600 }}>{student.student}</td>
+                                  <td>{student.branch || 'N/A'}</td>
+                                  <td>Year {student.year || 'N/A'}</td>
+                                  <td style={{ fontWeight: 600 }}>{student.cgpa ?? 'N/A'}</td>
+                                  <td>{student.active_backlogs ?? 0}</td>
+                                  <td>
+                                    <span className="admin-table-eligible-badge">Eligible</span>
+                                  </td>
+                                  <td style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
+                                    {student.reason}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
                     </div>
                   )}

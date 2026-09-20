@@ -9,63 +9,63 @@
    ========================================================================== */
 
 :root {
-  /* Color Palette - Canvas & Surfaces */
-  --bg-canvas: #F7F6F3;
-  --bg-canvas-subtle: #F1F0EC;
+  /* Color Palette - Warm Editorial Studio Canvas & Surfaces */
+  --bg-canvas: #F8F9FA;
+  --bg-canvas-subtle: #F1F5F9;
   --bg-surface: #FFFFFF;
   --bg-surface-elevated: #FFFFFF;
-  --bg-surface-hover: #FAFAFA;
-  --bg-surface-active: #F4F4F5;
+  --bg-surface-hover: #F8FAFC;
+  --bg-surface-active: #F1F5F9;
 
-  /* Typography Colors */
-  --text-primary: #2F3437;       /* Warm charcoal */
-  --text-secondary: #5F6361;     /* Muted body */
-  --text-tertiary: #787774;      /* Metadata / captions */
-  --text-subtle: #A09E98;        /* Placeholder / disabled */
+  /* Typography Colors - High Restraint Midnight & Slate Hierarchy */
+  --text-primary: #0F172A;       /* Deep Midnight Charcoal */
+  --text-secondary: #475569;     /* Slate body */
+  --text-tertiary: #64748B;      /* Metadata / captions */
+  --text-subtle: #94A3B8;        /* Placeholder / disabled */
 
-  /* Primary Accent - Deep Indigo / Blue */
-  --color-brand-primary: #4B5563; /* Restrained indigo-gray */
-  --color-brand-secondary: #52617A;
-  --color-brand-light: #EEF1F5;
-  --color-brand-border: #D3D9E3;
-  --color-brand-hover: #374151;
+  /* Primary Accents - Midnight Charcoal & Refined Forest Emerald */
+  --color-brand-primary: #0F172A; /* Deep Midnight Charcoal */
+  --color-brand-secondary: #0D9488; /* Refined Forest Emerald / Teal */
+  --color-brand-light: #F0FDFA;   /* Subtle Mint Tint */
+  --color-brand-border: #CCFBF1;
+  --color-brand-hover: #1E293B;
 
-  /* Semantic Status: Eligible (Muted Pastel Green) */
-  --status-eligible-bg: #EDF3EC;
-  --status-eligible-border: #C6E4CC;
-  --status-eligible-text: #166534;
-  --status-eligible-dot: #15803D;
+  /* Semantic Status: Eligible (Semi-transparent mint fill with dark forest green text) */
+  --status-eligible-bg: rgba(13, 148, 136, 0.08);
+  --status-eligible-border: rgba(13, 148, 136, 0.22);
+  --status-eligible-text: #0F766E;
+  --status-eligible-dot: #0D9488;
 
-  /* Semantic Status: Needs Information / Action (Muted Pastel Amber) */
-  --status-needs-info-bg: #FEF3C7;
-  --status-needs-info-border: #FDE68A;
+  /* Semantic Status: Needs Information / Action (Semi-transparent amber fill with dark amber text) */
+  --status-needs-info-bg: rgba(245, 158, 11, 0.08);
+  --status-needs-info-border: rgba(245, 158, 11, 0.24);
   --status-needs-info-text: #92400E;
   --status-needs-info-dot: #D97706;
 
-  /* Semantic Status: Not Eligible (Muted Pastel Red) */
-  --status-not-eligible-bg: #FEE2E2;
-  --status-not-eligible-border: #FECACA;
+  /* Semantic Status: Not Eligible (Semi-transparent rose fill with dark crimson text) */
+  --status-not-eligible-bg: rgba(239, 68, 68, 0.08);
+  --status-not-eligible-border: rgba(239, 68, 68, 0.22);
   --status-not-eligible-text: #991B1B;
   --status-not-eligible-dot: #DC2626;
 
   /* Semantic Status: Neutral / Info */
-  --status-neutral-bg: #F1F5F9;
+  --status-neutral-bg: #F8FAFC;
   --status-neutral-border: #E2E8F0;
   --status-neutral-text: #334155;
   --status-neutral-dot: #64748B;
 
-  /* Structural Borders */
-  --border-light: #EAE8E3;
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-strong: #D1D5DB;
+  /* Structural Borders - Subtle crisp 1px borders (#E2E8F0) */
+  --border-light: #E2E8F0;
+  --border-subtle: rgba(15, 23, 42, 0.06);
+  --border-strong: #CBD5E1;
 
-  /* Shadows (ultra-diffuse, restrained) */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.03);
-  --shadow-popover: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  /* Shadows (ultra-diffuse, restrained micro-depth instead of heavy drop shadows) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.03), 0 4px 12px rgba(15, 23, 42, 0.03);
+  --shadow-popover: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
 
-  /* Radius System (8px-16px target) */
+  /* Radius System (clean modern radii) */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -506,13 +506,14 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-brand-primary);
+  letter-spacing: 0.05em;
+  color: var(--color-brand-secondary);
   background-color: var(--color-brand-light);
-  padding: 4px 10px;
+  border: 1px solid var(--color-brand-border);
+  padding: 4px 12px;
   border-radius: var(--radius-full);
   margin-bottom: 10px;
 }
@@ -832,46 +833,52 @@ a {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 24px 28px;
   box-shadow: var(--shadow-xs);
   transition: var(--transition-card);
 }
 
 .stat-card:hover {
-  border-color: #CBD5E1;
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
 .stat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .stat-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-tertiary);
+  letter-spacing: -0.01em;
 }
 
 .stat-icon-wrapper {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: var(--bg-canvas-subtle);
   color: var(--color-brand-primary);
+  border: 1px solid var(--border-light);
 }
 
 .stat-value {
-  font-size: 28px;
+  font-family: var(--font-sans);
+  font-size: 30px;
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--text-primary);
-  line-height: 1.1;
+  line-height: 1.15;
   margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-description {
@@ -880,6 +887,7 @@ a {
   display: flex;
   align-items: center;
   gap: 6px;
+  line-height: 1.4;
 }
 
 /* StatusBadge */
@@ -887,9 +895,9 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 11px;
   border-radius: var(--radius-full);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.01em;
   border: 1px solid transparent;
@@ -946,7 +954,7 @@ a {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-sm);
   background-color: var(--bg-canvas-subtle);
   border: 1px solid var(--border-light);
@@ -954,8 +962,8 @@ a {
 
 .deadline-badge.urgent {
   color: #B45309;
-  background-color: #FEF3C7;
-  border-color: #FDE68A;
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
   font-weight: 600;
 }
 
@@ -963,18 +971,36 @@ a {
 .notice-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: 24px;
+  border-left: 3.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
   box-shadow: var(--shadow-xs);
   transition: var(--transition-card);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+}
+
+.notice-card.status-eligible,
+.notice-card[data-status="eligible"] {
+  border-left-color: var(--status-eligible-dot);
+}
+
+.notice-card.status-needs-info,
+.notice-card[data-status="needs-info"] {
+  border-left-color: var(--status-needs-info-dot);
+}
+
+.notice-card.status-not-eligible,
+.notice-card[data-status="not-eligible"] {
+  border-left-color: var(--status-not-eligible-dot);
 }
 
 .notice-card:hover {
-  border-color: #CBD5E1;
-  box-shadow: var(--shadow-card);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
 .notice-card-header {
@@ -2224,11 +2250,14 @@ a {
 
 .priority-eyebrow {
   background-color: var(--color-brand-light);
-  color: var(--color-brand-primary);
+  color: var(--color-brand-secondary);
+  border: 1px solid var(--color-brand-border);
+  border-radius: var(--radius-full);
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .1em;
-  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  padding: 4px 12px;
 }
 
 .dashboard-greeting,
@@ -2247,31 +2276,33 @@ a {
 .section-card,
 .admin-document-panel,
 .admin-extraction-panel {
-  border-radius: 8px;
-  box-shadow: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
 }
 
 .notice-card,
 .stat-card {
-  padding: 22px;
+  padding: 24px 28px;
 }
 
 .notice-card:hover,
 .stat-card:hover {
-  border-color: #D5D2CA;
-  box-shadow: 0 2px 8px rgba(47, 52, 55, .04);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
 .stat-card-grid {
-  gap: 14px;
-  margin-bottom: 30px;
+  gap: 18px;
+  margin-bottom: 32px;
 }
 
 .stat-value {
-  font-family: 'Newsreader', Georgia, serif;
-  font-size: 32px;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
 .filter-toolbar {
@@ -2281,14 +2312,14 @@ a {
 }
 
 .filter-pill-btn {
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 7px 12px;
 }
 
 .search-input,
 .input-text,
 .select-custom {
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   min-height: 38px;
 }
 
@@ -2297,15 +2328,16 @@ a {
 .btn-secondary,
 .btn-outline,
 .btn-ghost {
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
 }
 
 .btn-primary {
-  background-color: #2F3437;
+  background-color: var(--color-brand-primary);
+  color: #FFFFFF;
 }
 
 .btn-primary:hover {
-  background-color: #454B4E;
+  background-color: var(--color-brand-hover);
 }
 
 .notice-title,
@@ -2823,9 +2855,9 @@ a {
 }
 
 .dropdown-role-chip.admin {
-  background-color: #EFF6FF;
-  color: #1D4ED8;
-  border: 1px solid #BFDBFE;
+  background-color: #0F172A;
+  color: #FFFFFF;
+  border: 1px solid #0F172A;
 }
 
 .dropdown-role-chip.student {
@@ -2848,9 +2880,9 @@ a {
 }
 
 .nav-role-badge.active-admin {
-  background-color: #EFF6FF;
-  color: #1D4ED8;
-  border: 1px solid #BFDBFE;
+  background-color: rgba(13, 148, 136, 0.1);
+  color: #0F766E;
+  border: 1px solid rgba(13, 148, 136, 0.25);
 }
 
 

@@ -79,7 +79,8 @@ export const NoticeCard = ({ notice, onNavigate }) => {
 
   return (
     <article
-      className="notice-card"
+      className={`notice-card status-${statusCategory}`}
+      data-status={statusCategory}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
