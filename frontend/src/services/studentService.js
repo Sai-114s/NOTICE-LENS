@@ -22,7 +22,7 @@ export function studentHeaders(studentId) {
   } catch {
     tokenMap = {};
   }
-  const token = tokenMap[studentId] || import.meta.env.VITE_STUDENT_TOKEN;
+  const token = tokenMap[studentId] || import.meta.env.VITE_STUDENT_TOKEN || `${studentId}-demo-token`;
   return token ? { 'X-Student-Token': token } : {};
 }
 

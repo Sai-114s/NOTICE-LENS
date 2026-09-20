@@ -178,6 +178,65 @@
       "contact": null,
       "id": "2bc2a02c-d79e-439b-9ef2-fc62f97d5e07",
       "status": "draft"
+    },
+    {
+      "title": "TCS Digital Hiring 2026",
+      "organization": "TCS",
+      "opportunityType": null,
+      "shortDescription": "TCS Digital Hiring 2026” from TCS. The notice should state that students from CSE, IT, and ECE branches, studying in 3rd or 4th year, with a minimum CGPA of 7.5 and zero active backlogs, are eligible. It should also require a minimum of 75% in 10th and 12th standard and a B.Tech degree. The application deadline should be 23 September 2026 at 5:00 PM. Required documents should include a resume, college ID, 10th marksheet, and 12th marksheet. Mention that students must register online before the deadline and provide a valid application link. Test whether the system extracts the organization, eligibility criteria, deadline, documents, and instructions correctly. Test it with Rahul, who should be eligible, and Arjun, whose branch is Mechanical and should therefore be marked not eligible.",
+      "deadline": "23 September 2026, 5:00 PM",
+      "application_url": null,
+      "extractionSource": "Extracted by local Strands agent",
+      "originalDocumentName": null,
+      "structuredNotice": {
+        "title": "TCS Digital Hiring 2026",
+        "organization": "TCS",
+        "type": null,
+        "description": "TCS Digital Hiring 2026” from TCS. The notice should state that students from CSE, IT, and ECE branches, studying in 3rd or 4th year, with a minimum CGPA of 7.5 and zero active backlogs, are eligible. It should also require a minimum of 75% in 10th and 12th standard and a B.Tech degree. The application deadline should be 23 September 2026 at 5:00 PM. Required documents should include a resume, college ID, 10th marksheet, and 12th marksheet. Mention that students must register online before the deadline and provide a valid application link. Test whether the system extracts the organization, eligibility criteria, deadline, documents, and instructions correctly. Test it with Rahul, who should be eligible, and Arjun, whose branch is Mechanical and should therefore be marked not eligible.",
+        "branches": [
+          "CSE",
+          "IT",
+          "ECE"
+        ],
+        "years": [
+          3,
+          4
+        ],
+        "min_cgpa": 7.5,
+        "max_active_backlogs": 0,
+        "min_10th_percentage": null,
+        "min_12th_percentage": null,
+        "required_degree": null,
+        "documents": [
+          "Resume",
+          "College ID",
+          "10th marksheet",
+          "12th marksheet"
+        ],
+        "deadline": "23 September 2026, 5:00 PM",
+        "application_url": null,
+        "application_method": null,
+        "instructions": [],
+        "contact": null
+      },
+      "criteria": {
+        "eligible_branches": [
+          "CSE",
+          "IT",
+          "ECE"
+        ],
+        "eligible_years": [
+          3,
+          4
+        ],
+        "min_cgpa": 7.5,
+        "max_active_backlogs": 0,
+        "min_tenth_percentage": null,
+        "min_twelfth_percentage": null,
+        "eligible_degrees": null
+      },
+      "id": "7844ac72-897a-4c73-8aff-e42ed358ac6c",
+      "status": "published"
     }
   ],
   "audit_logs": [],
@@ -228,6 +287,70 @@
       "degree": "B.Tech",
       "statusText": "Academic Records Pending Verification",
       "avatarLetter": "PS",
+      "actionItems": {}
+    },
+    {
+      "id": "sneha-patel",
+      "name": "Sneha Patel",
+      "role": "Student",
+      "branch": "IT",
+      "branchFullName": "Information Technology",
+      "year": 3,
+      "cgpa": 8.7,
+      "active_backlogs": 0,
+      "tenth_percentage": 91,
+      "twelfth_percentage": 89,
+      "degree": "B.Tech",
+      "statusText": "All Academic Records Verified",
+      "avatarLetter": "SP",
+      "actionItems": {}
+    },
+    {
+      "id": "vikram-reddy",
+      "name": "Vikram Reddy",
+      "role": "Student",
+      "branch": "CSM",
+      "branchFullName": "Computer Science & Engineering (AI & ML)",
+      "year": 3,
+      "cgpa": 8.9,
+      "active_backlogs": 0,
+      "tenth_percentage": 94,
+      "twelfth_percentage": 92,
+      "degree": "B.Tech",
+      "statusText": "All Academic Records Verified",
+      "avatarLetter": "VR",
+      "actionItems": {}
+    },
+    {
+      "id": "ananya-iyer",
+      "name": "Ananya Iyer",
+      "role": "Student",
+      "branch": "AIDS",
+      "branchFullName": "Artificial Intelligence & Data Science",
+      "year": 3,
+      "cgpa": 8.6,
+      "active_backlogs": 0,
+      "tenth_percentage": 90,
+      "twelfth_percentage": 88,
+      "degree": "B.Tech",
+      "statusText": "All Academic Records Verified",
+      "avatarLetter": "AI",
+      "actionItems": {}
+    },
+    {
+      "id": "rohan-verma",
+      "name": "Rohan Verma",
+      "role": "Student",
+      "branch": "ECE",
+      "branchFullName": "Electronics & Communication Engineering",
+      "year": 4,
+      "cgpa": 7.8,
+      "active_backlogs": 0,
+      "tenth_percentage": 85,
+      "twelfth_percentage": 83,
+      "degree": "B.Tech",
+      "statusText": "All Academic Records Verified",
+      "avatarLetter": "RV",
       "actionItems": {}
     }
   ]

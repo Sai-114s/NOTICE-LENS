@@ -1,7 +1,14 @@
 const studentService = require('../services/studentService');
 
 function getStudents(req, res) {
-    const students = studentService.getAllStudents().map(({ id, name, branch, role }) => ({ id, name, branch, role }));
+    const students = studentService.getAllStudents().map(({ id, name, branch, role, avatarLetter, year }) => ({
+        id,
+        name,
+        branch,
+        role,
+        avatarLetter: avatarLetter || (name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'ST'),
+        year
+    }));
     res.json({ students });
 }
 

@@ -58,18 +58,26 @@ async function evaluateNoticeForStudent(notice, student) {
                 status: "missing",
                 detail: "Please specify your branch in student profile."
             });
-        } else if (allowedBranches.includes(student.branch)) {
-            requirements.push({
-                name: "Branch",
-                status: "pass",
-                detail: `${student.branch} accepted`
-            });
         } else {
-            requirements.push({
-                name: "Branch",
-                status: "fail",
-                detail: `${student.branch} is not among the eligible branches.`
-            });
+            const studentBranchUpper = student.branch.trim().toUpperCase();
+            const allowedUpper = allowedBranches.map(b => String(b).trim().toUpperCase());
+            const alliedBranches = new Set(['CSM', 'AIDS', 'AIML', 'AI&DS', 'CSD', 'IT', 'CSE', 'ALLIED']);
+            const hasAlliedAllowed = allowedUpper.some(b => b === 'ALLIED' || b === 'ALLIED BRANCHES' || b.includes('ALLIED'));
+            const isBranchAccepted = allowedBranches.includes(student.branch) || allowedUpper.includes(studentBranchUpper) || (hasAlliedAllowed && alliedBranches.has(studentBranchUpper));
+
+            if (isBranchAccepted) {
+                requirements.push({
+                    name: "Branch",
+                    status: "pass",
+                    detail: `${student.branch} accepted`
+                });
+            } else {
+                requirements.push({
+                    name: "Branch",
+                    status: "fail",
+                    detail: `${student.branch} is not among the eligible branches.`
+                });
+            }
         }
     } else {
         requirements.push({

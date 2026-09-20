@@ -10,8 +10,19 @@ def evaluate_eligibility(criteria: NoticeCriteria, student: StudentProfile) -> E
         if student.branch is None:
             missing_information.append("Branch")
             action_items.append("Update branch in profile")
-        elif student.branch not in criteria.eligible_branches:
-            reasons.append(f"Branch '{student.branch}' is not eligible. Allowed: {', '.join(criteria.eligible_branches)}")
+        else:
+            allowed_branches = [b.strip() for b in criteria.eligible_branches if b and b.strip()]
+            allowed_upper = {b.upper() for b in allowed_branches}
+            student_b_upper = student.branch.strip().upper()
+
+            is_eligible = student.branch in allowed_branches or student_b_upper in allowed_upper
+            allied_branches = {"CSM", "AIDS", "AIML", "AI&DS", "CSD", "IT", "CSE", "ALLIED"}
+            if not is_eligible and any(b in {"ALLIED", "ALLIED BRANCHES", "CSE & ALLIED", "CSE, IT & ALLIED"} for b in allowed_upper):
+                if student_b_upper in allied_branches:
+                    is_eligible = True
+
+            if not is_eligible:
+                reasons.append(f"Branch '{student.branch}' is not eligible. Allowed: {', '.join(criteria.eligible_branches)}")
 
     # Year
     if criteria.eligible_years is not None:
