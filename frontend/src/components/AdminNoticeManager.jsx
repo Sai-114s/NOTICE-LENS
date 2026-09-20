@@ -32,6 +32,7 @@ function Icon({ name, size = 16 }) {
     save: <><path d="M5 3h12l2 2v16H5z" /><path d="M8 3v6h8V3m-7 13h6" /></>,
     publish: <><path d="M4 12 20 4l-5 16-3-6z" /><path d="m12 14 8-10" /></>,
     warning: <><path d="M12 3 2.8 20h18.4z" /><path d="M12 9v4m0 3h.01" /></>,
+    trash: <><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></>,
     check: <path d="m5 12 4 4L19 6" />
   };
   return <svg className="admin-icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
@@ -129,6 +130,18 @@ export const AdminNoticeManager = ({ onNavigateImpact, onViewAsStudent }) => {
     setPreviewUrl(URL.createObjectURL(nextFile));
     setPhase('uploading');
     setTextPreview(mimeType === 'text/plain' ? await nextFile.text() : '');
+  };
+
+  const removeFile = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    setTextPreview('');
+    setError('');
+    setNoticeId(null);
+    setForm(EMPTY_NOTICE);
+    setPhase('idle');
+    if (inputRef.current) inputRef.current.value = '';
   };
 
   const runExtraction = async () => {
@@ -262,7 +275,20 @@ export const AdminNoticeManager = ({ onNavigateImpact, onViewAsStudent }) => {
       <article className="admin-document-panel admin-reveal" style={{ '--index': 0 }}>
         <div className="admin-panel-title">
           <div><span className="admin-panel-overline">Original notice</span><h2>Document preview</h2></div>
-          {file && <span className="admin-file-name"><Icon name="file" size={14} />{file.name}</span>}
+          {file && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="admin-file-name"><Icon name="file" size={14} />{file.name}</span>
+              <button
+                type="button"
+                className="admin-icon-remove-btn"
+                onClick={removeFile}
+                title="Remove uploaded document"
+                aria-label="Remove document"
+              >
+                <Icon name="trash" size={13} />
+              </button>
+            </div>
+          )}
         </div>
 
         {!file && !pastedText && <label className="admin-dropzone" htmlFor="notice-file-input">
@@ -276,14 +302,46 @@ export const AdminNoticeManager = ({ onNavigateImpact, onViewAsStudent }) => {
           {previewKind === 'image' && <img src={previewUrl} alt={`Original notice: ${file.name}`} />}
           {previewKind === 'pdf' && <iframe title={`Original notice: ${file.name}`} src={previewUrl} />}
           {previewKind === 'text' && <pre>{textPreview}</pre>}
-          <label className="admin-replace-file" htmlFor="notice-file-input"><Icon name="upload" size={14} />Replace document<input ref={inputRef} id="notice-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.txt,application/pdf,image/png,image/jpeg,text/plain" onChange={(event) => setUploadedFile(event.target.files?.[0])} /></label>
+          <div className="admin-preview-overlay-actions">
+            <label className="admin-replace-file" htmlFor="notice-file-input">
+              <Icon name="upload" size={14} />
+              Replace document
+              <input ref={inputRef} id="notice-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.txt,application/pdf,image/png,image/jpeg,text/plain" onChange={(event) => setUploadedFile(event.target.files?.[0])} />
+            </label>
+            <button
+              type="button"
+              className="admin-remove-file-overlay"
+              onClick={removeFile}
+              title="Remove document"
+            >
+              <Icon name="trash" size={14} />
+              Remove document
+            </button>
+          </div>
         </div>}
 
         {!file && <div className="admin-text-source"><label htmlFor="pasted-notice">Or paste notice text</label><textarea id="pasted-notice" value={pastedText} onChange={(event) => { setPastedText(event.target.value); setError(''); }} placeholder="Paste the original notice exactly as received." rows={9} /></div>}
 
         <div className="admin-document-actions">
-          <button type="button" className="admin-secondary-button" onClick={() => inputRef.current?.click()}><Icon name="upload" />{file ? 'Replace file' : 'Select file'}</button>
-          <button type="button" className="admin-primary-button" disabled={busy || (!file && !pastedText.trim())} onClick={runExtraction}><Icon name={phase === 'failure' ? 'retry' : 'file'} />{phase === 'failure' ? 'Retry extraction' : 'Extract requirements'}</button>
+          <button type="button" className="admin-secondary-button" onClick={() => inputRef.current?.click()}>
+            <Icon name="upload" />
+            {file ? 'Replace file' : 'Select file'}
+          </button>
+          {file && (
+            <button
+              type="button"
+              className="admin-remove-button"
+              onClick={removeFile}
+              title="Remove uploaded document"
+            >
+              <Icon name="trash" />
+              Remove file
+            </button>
+          )}
+          <button type="button" className="admin-primary-button" disabled={busy || (!file && !pastedText.trim())} onClick={runExtraction}>
+            <Icon name={phase === 'failure' ? 'retry' : 'file'} />
+            {phase === 'failure' ? 'Retry extraction' : 'Extract requirements'}
+          </button>
         </div>
         {error && <div className="admin-error" role="alert"><Icon name="warning" /> <span>{error}</span></div>}
       </article>
