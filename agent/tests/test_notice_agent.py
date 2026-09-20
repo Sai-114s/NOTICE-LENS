@@ -47,6 +47,34 @@ class TestNoticeAgent(unittest.TestCase):
         with self.assertRaises(NoticeExtractionError):
             validate_structured_notice(malformed)
 
+    def test_falabella_notice(self):
+        text = """ear Students,
+
+Please go through the Falabella JD for the *2027 batch.
+
+Company: Falabella India
+Role: AI/ML Engineer, Data Engineering, Full Stack Developer
+Eligible Branches: CSE, IT & Allied
+CGPA: 8.5 and above
+Backlogs: No backlogs
+Package: ₹12 LPA
+Stipend : 35k/month 
+Work Locations: Bangalore
+
+
+
+Team CDS"""
+        result = NoticeAgent("DEMO").extract_structured_data(text)
+        self.assertEqual(result["organization"], "Falabella India")
+        self.assertEqual(result["title"], "Falabella India - AI/ML Engineer, Data Engineering, Full Stack Developer")
+        self.assertEqual(result["min_cgpa"], 8.5)
+        self.assertEqual(result["max_active_backlogs"], 0)
+        self.assertIn("CSE", result["branches"])
+        self.assertIn("IT", result["branches"])
+        self.assertEqual(result["years"], [3])
+        self.assertEqual(result["contact"], "Team CDS")
+        self.assertEqual(result["type"], "Placement")
+
 
 if __name__ == "__main__":
     unittest.main()

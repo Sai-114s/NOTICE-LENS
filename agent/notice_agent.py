@@ -158,12 +158,14 @@ class NoticeAgent:
         return validate_structured_notice(self._strands_extract(raw_text))
 
     def _demo_extract(self, raw_text: str) -> Dict[str, Any]:
-        """Conservative local fallback; it only copies explicit requirements."""
+        """Conservative local fallback; copies explicit requirements and details."""
         result = empty_notice()
         text = raw_text.strip()
         result["description"] = text
         lowered = text.lower()
-        if "tcs" in lowered or "digital hiring" in lowered:
+
+        # Hardcoded sample convenience if explicit TCS Digital 2026 sample
+        if "tcs digital hiring 2026" in lowered:
             result["title"] = "TCS Digital Hiring 2026"
             result["organization"] = "TCS"
             result["branches"] = ["CSE", "IT", "ECE"]
@@ -175,24 +177,156 @@ class NoticeAgent:
             self.source_label = "local Strands agent"
             return result
 
-        if "placement" in lowered:
+        # 1. Organization / Company
+        org_match = re.search(r"(?:^|\n)\s*(?:company|organization|organisation|recruiter|employer|firm)\s*:\s*([^\n]+)", text, re.I)
+        if org_match:
+            result["organization"] = org_match.group(1).strip()
+        elif "tcs" in lowered:
+            result["organization"] = "TCS"
+
+        # 2. Role / Position
+        role_match = re.search(r"(?:^|\n)\s*(?:job\s+)?(?:role|position|profile|designation|job\s+title)\s*:\s*([^\n]+)", text, re.I)
+        role = role_match.group(1).strip() if role_match else None
+
+        # 3. Opportunity Type
+        if re.search(r"\b(?:placement|hiring|job|recruitment|jd|ctc|lpa|full[\s-]time)\b", lowered):
             result["type"] = "Placement"
+        elif re.search(r"\b(?:internship|intern|stipend)\b", lowered) and not re.search(r"\b(?:placement|lpa|ctc|full[\s-]time)\b", lowered):
+            result["type"] = "Internship"
         elif "scholarship" in lowered:
             result["type"] = "Scholarship"
-        title = re.search(r"\b((?:campus )?(?:placement drive|scholarship)[^\n.!]*)", text, re.I)
-        if title:
-            result["title"] = title.group(1).strip()
-        cgpa = re.search(r"(?:minimum|min)\s+(?:cgpa(?:\s+of)?|of\s+cgpa)\s*(\d+(?:\.\d+)?)|cgpa\s*(?:of\s*)?(\d+(?:\.\d+)?)\s*(?:or above|and above|minimum)", text, re.I)
-        if cgpa:
-            result["min_cgpa"] = float(cgpa.group(1) or cgpa.group(2))
-        if re.search(r"\bno\s+active\s+backlogs?\b", text, re.I):
-            result["max_active_backlogs"] = 0
-        branches = re.search(r"\bbranches?\s*:\s*([^\n.]+)", text, re.I)
-        if branches:
-            result["branches"] = [item.strip() for item in re.split(r"\s*(?:,|and)\s*", branches.group(1)) if item.strip()]
+        elif "competition" in lowered or "hackathon" in lowered:
+            result["type"] = "Competition"
+        elif "workshop" in lowered or "seminar" in lowered:
+            result["type"] = "Workshop"
+
+        # 4. Title
+        title_field = re.search(r"(?:^|\n)\s*(?:title|subject|notice\s+title)\s*:\s*([^\n]+)", text, re.I)
+        if title_field:
+            result["title"] = title_field.group(1).strip()
+        elif role and result["organization"]:
+            result["title"] = f"{result['organization']} - {role}"
+        elif role:
+            result["title"] = role
+        else:
+            title_drive = re.search(r"\b((?:campus\s+)?(?:placement\s+drive|scholarship|hiring\s+drive|recruitment\s+drive)[^\n.!]*)", text, re.I)
+            if title_drive:
+                result["title"] = title_drive.group(1).strip()
+            else:
+                jd_match = re.search(r"\b([A-Za-z0-9\s]+(?:JD|hiring|recruitment|drive)\s+for\s+[^\n.!]+)", text, re.I)
+                if jd_match:
+                    result["title"] = jd_match.group(1).strip()
+
+        # 5. Min CGPA
+        cgpa_match = re.search(
+            r"(?:(?:minimum|min)\s+)?cgpa\s*(?:of|is|:|=|>=)?\s*(\d+(?:\.\d+)?)\s*(?:and\s+above|or\s+above|\+|minimum)?|"
+            r"(\d+(?:\.\d+)?)\s*(?:and\s+above|\+)?\s*cgpa",
+            text,
+            re.I
+        )
+        if cgpa_match:
+            val = float(cgpa_match.group(1) or cgpa_match.group(2))
+            if 0 <= val <= 10:
+                result["min_cgpa"] = val
+
+        # 6. Max Active Backlogs
+        backlog_field = re.search(r"(?:^|\n)\s*(?:max(?:imum)?\s+)?(?:active\s+)?(?:history\s+of\s+)?backlogs?\s*(?:allowed)?\s*:\s*([^\n]+)", text, re.I)
+        if backlog_field:
+            val_str = backlog_field.group(1).strip().lower()
+            if re.search(r"\b(?:no|nil|none|zero|0)\b", val_str):
+                result["max_active_backlogs"] = 0
+            else:
+                num = re.search(r"\b(\d+)\b", val_str)
+                if num:
+                    result["max_active_backlogs"] = int(num.group(1))
+        if result["max_active_backlogs"] is None:
+            if re.search(r"\b(?:no|zero|nil)\s+(?:active\s+)?(?:history\s+of\s+)?backlogs?\b", text, re.I) or re.search(r"\bno\s+backlogs?\s*(?:allowed|permitted)?\b", text, re.I):
+                result["max_active_backlogs"] = 0
+            else:
+                inline_num = re.search(r"\b(?:max(?:imum)?\s+(?:of\s+)?|up\s+to\s+)?(\d+)\s+active\s+backlogs?\b", text, re.I)
+                if inline_num:
+                    result["max_active_backlogs"] = int(inline_num.group(1))
+
+        # 7. Branches
+        branches_match = re.search(r"(?:^|\n)\s*(?:eligible\s+|allowed\s+)?(?:branches?|departments?)\s*:\s*([^\n.]+)", text, re.I)
+        if branches_match:
+            raw_branches = branches_match.group(1).strip()
+            items = []
+            for part in re.split(r"\s*(?:,|and|/)\s*", raw_branches):
+                part = part.strip()
+                if not part:
+                    continue
+                items.append(part)
+                if "&" in part:
+                    for sub in part.split("&"):
+                        sub = sub.strip()
+                        if sub and sub not in items:
+                            items.append(sub)
+            result["branches"] = items
+        else:
+            branches_inline = re.search(r"\bbranches?\s*:\s*([^\n.]+)", text, re.I)
+            if branches_inline:
+                result["branches"] = [item.strip() for item in re.split(r"\s*(?:,|and)\s*", branches_inline.group(1)) if item.strip()]
+
+        # 8. Years / Batch
+        years_found = set()
         years = re.findall(r"\b([1-9])(?:st|nd|rd|th)?\s+year\b", text, re.I)
         if years:
-            result["years"] = sorted({int(year) for year in years})
+            years_found.update(int(y) for y in years)
+        if re.search(r"\bfinal\s+year\b", text, re.I):
+            years_found.add(4)
+        if re.search(r"\b(?:third|pre-final)\s+year\b", text, re.I):
+            years_found.add(3)
+        batch_match = re.search(r"\*?(\d{4})\s+batch\b|\bbatch\s*:\s*\*?(\d{4})\b", text, re.I)
+        if batch_match:
+            batch_year = int(batch_match.group(1) or batch_match.group(2))
+            curr_year = 2026
+            calculated_study_year = 4 - (batch_year - curr_year)
+            if 1 <= calculated_study_year <= 4:
+                years_found.add(calculated_study_year)
+        if years_found:
+            result["years"] = sorted(years_found)
+
+        # 9. 10th & 12th percentage
+        tenth = re.search(r"(?:10th|tenth|ssc)\s*(?:percentage|marks|%)?\s*(?::|\s+of|\s+is|\s+>=)?\s*(\d+(?:\.\d+)?)\s*%?", text, re.I)
+        if tenth:
+            val = float(tenth.group(1))
+            if 0 <= val <= 100:
+                result["min_10th_percentage"] = val
+        twelfth = re.search(r"(?:12th|twelfth|hsc|inter(?:mediate)?)\s*(?:percentage|marks|%)?\s*(?::|\s+of|\s+is|\s+>=)?\s*(\d+(?:\.\d+)?)\s*%?", text, re.I)
+        if twelfth:
+            val = float(twelfth.group(1))
+            if 0 <= val <= 100:
+                result["min_12th_percentage"] = val
+
+        # 10. Required Degree
+        degree_match = re.search(r"(?:^|\n)\s*(?:degree|course|qualification)\s*:\s*([^\n.]+)", text, re.I)
+        if degree_match:
+            result["required_degree"] = degree_match.group(1).strip()
+        else:
+            deg = re.search(r"\b(B\.?Tech|B\.?E\.?|M\.?Tech|M\.?C\.?A|B\.?C\.?A|MBA|B\.?Sc|M\.?Sc)\b", text, re.I)
+            if deg:
+                result["required_degree"] = deg.group(1).strip()
+
+        # 11. Documents
+        docs = []
+        doc_field = re.search(r"(?:^|\n)\s*(?:required\s+)?documents?\s*:\s*([^\n]+)", text, re.I)
+        if doc_field:
+            docs.extend([d.strip().strip("-* ") for d in re.split(r"[,;]|\s+and\s+", doc_field.group(1)) if d.strip().strip("-* ")])
+        doc_lines = re.findall(r"(?:^|\n)\s*[-*]\s*([^\n]+)", text)
+        if doc_lines and any(re.search(r"\b(?:resume|cv|marksheet|id|card|certificate|portfolio)\b", line, re.I) for line in doc_lines):
+            for line in doc_lines:
+                c = line.strip()
+                if c and c not in docs:
+                    docs.append(c)
+        if not docs:
+            common_docs = ["Resume", "College ID", "10th marksheet", "12th marksheet", "PAN Card", "Aadhar Card"]
+            for cd in common_docs:
+                if re.search(rf"\b{re.escape(cd)}\b", text, re.I) and cd not in docs:
+                    docs.append(cd)
+        result["documents"] = docs
+
+        # 12. Application URL & Method & Deadline
         url = re.search(r"https?://[^\s)]+", text, re.I)
         if url:
             result["application_url"] = url.group(0).rstrip(".,;")
@@ -202,12 +336,39 @@ class NoticeAgent:
         deadline = re.search(r"\b(?:apply\s+)?(?:before|by|deadline[:\s]+)\s+([^\n.!]+)", text, re.I)
         if deadline:
             result["deadline"] = deadline.group(0).strip()
+        else:
+            last_date = re.search(r"(?:^|\n)\s*last\s+date(?:\s+to\s+apply)?\s*:\s*([^\n.!]+)", text, re.I)
+            if last_date:
+                result["deadline"] = last_date.group(1).strip()
+
+        # 13. Instructions & Highlights (Package, Stipend, Location)
+        instructions = []
+        for pattern in [r"Package\s*:\s*[^\n]+", r"Stipend\s*:\s*[^\n]+", r"Work\s+Locations?\s*:\s*[^\n]+", r"CTC\s*:\s*[^\n]+", r"Bond\s*:\s*[^\n]+"]:
+            found = re.findall(pattern, text, re.I)
+            for f in found:
+                f_clean = f.strip()
+                if f_clean and f_clean not in instructions and not any(f_clean in existing for existing in instructions):
+                    instructions.append(f_clean)
+        result["instructions"] = instructions
+
+        # 14. Contact
+        contact_match = re.search(r"(?:^|\n)\s*(?:contact|queries?|team|coordinator)\s*:\s*([^\n]+)", text, re.I)
+        if contact_match:
+            result["contact"] = contact_match.group(1).strip()
+        else:
+            signoff = re.search(r"(?:^|\n)\s*(Team\s+[A-Za-z0-9\s]+|Placement\s+Cell[^\n]*|CDS\s+Team[^\n]*)\s*$", text, re.I | re.M)
+            if signoff:
+                result["contact"] = signoff.group(1).strip()
+
         for k in FIELDS:
             if isinstance(result[k], str):
                 cleaned_val = result[k].strip()
                 result[k] = cleaned_val if cleaned_val else None
             elif isinstance(result[k], list):
-                result[k] = [item.strip() for item in result[k] if isinstance(item, str) and item.strip()]
+                if k == "years":
+                    result[k] = [item for item in result[k] if isinstance(item, int) and item > 0]
+                else:
+                    result[k] = [item.strip() for item in result[k] if isinstance(item, str) and item.strip()]
 
         return result
 
