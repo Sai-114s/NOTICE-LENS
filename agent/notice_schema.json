@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NoticeLensStructuredNotice",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": ["string", "null"] },
+    "organization": { "type": ["string", "null"] },
+    "type": { "type": ["string", "null"] },
+    "description": { "type": ["string", "null"] },
+    "branches": { "type": "array", "items": { "type": "string" } },
+    "years": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+    "min_cgpa": { "type": ["number", "null"], "minimum": 0, "maximum": 10 },
+    "max_active_backlogs": { "type": ["integer", "null"], "minimum": 0 },
+    "min_10th_percentage": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "min_12th_percentage": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "required_degree": { "type": ["string", "null"] },
+    "documents": { "type": "array", "items": { "type": "string" } },
+    "deadline": { "type": ["string", "null"] },
+    "application_url": { "type": ["string", "null"] },
+    "application_method": { "type": ["string", "null"] },
+    "instructions": { "type": "array", "items": { "type": "string" } },
+    "contact": { "type": ["string", "null"] }
+  },
+  "required": [
+    "title", "organization", "type", "description", "branches", "years",
+    "min_cgpa", "max_active_backlogs", "min_10th_percentage",
+    "min_12th_percentage", "required_degree", "documents", "deadline",
+    "application_url", "application_method", "instructions", "contact"
+  ]
+}

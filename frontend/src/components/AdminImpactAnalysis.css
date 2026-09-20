@@ -1,0 +1,249 @@
+.admin-impact {
+  color: #2f3437;
+  max-width: 1280px;
+  padding: 12px 0 56px;
+}
+
+.impact-heading {
+  align-items: flex-end;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+}
+
+.impact-eyebrow {
+  color: #787774;
+  display: block;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.impact-heading h1 {
+  color: #272723;
+  font-family: "Newsreader", "Iowan Old Style", Georgia, serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 500;
+  letter-spacing: -.03em;
+  line-height: 1;
+  margin: 8px 0 10px;
+}
+
+.impact-heading p {
+  color: #787774;
+  font-size: 13px;
+  margin: 0;
+}
+
+.impact-data-label {
+  border: 1px solid #eaeaea;
+  color: #787774;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  padding: 9px 11px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.impact-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.impact-toolbar label {
+  color: #787774;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.impact-toolbar select {
+  background: #fff;
+  border: 1px solid #d9d8d3;
+  border-radius: 4px;
+  color: #2f3437;
+  font: inherit;
+  max-width: 680px;
+  min-height: 38px;
+  padding: 0 34px 0 11px;
+}
+
+.impact-context {
+  border-left: 3px solid #d8e8df;
+  display: grid;
+  gap: 3px;
+  margin: 18px 0;
+  padding: 4px 0 4px 14px;
+}
+
+.impact-context span {
+  color: #787774;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.impact-context strong {
+  color: #272723;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.impact-summary-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 24px 0 12px;
+}
+
+.impact-summary-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-top: 3px solid #d7d6d1;
+  min-height: 100px;
+  padding: 16px 18px;
+}
+
+.impact-summary-card strong {
+  color: #272723;
+  display: block;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: 15px;
+}
+
+.impact-summary-label {
+  color: #787774;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.impact-summary-eligible { border-top-color: #a9c7ae; }
+.impact-summary-not-eligible { border-top-color: #e3b0ad; }
+.impact-summary-needs-info { border-top-color: #e5ce93; }
+
+.impact-engine-note {
+  color: #787774;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 11px;
+  margin: 0 0 26px;
+}
+
+.impact-filters {
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  gap: 22px;
+  margin-bottom: 0;
+}
+
+.impact-filters button {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: #787774;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 12px 0 10px;
+}
+
+.impact-filters button.active {
+  border-bottom-color: #2f3437;
+  color: #2f3437;
+  font-weight: 700;
+}
+
+.impact-table-wrap {
+  overflow-x: auto;
+}
+
+.impact-table {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.impact-table th {
+  color: #787774;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  padding: 14px 12px 12px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.impact-table td {
+  border-top: 1px solid #eaeaea;
+  color: #4c504f;
+  font-size: 13px;
+  padding: 16px 12px;
+  vertical-align: middle;
+}
+
+.impact-table th:first-child,
+.impact-table td:first-child { padding-left: 0; }
+
+.impact-student {
+  color: #272723 !important;
+  font-weight: 700;
+}
+
+.impact-reason { max-width: 330px; }
+
+.impact-status {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  padding: 5px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.impact-status-eligible { background: #edf3ec; color: #346538; }
+.impact-status-not-eligible { background: #fdebec; color: #9f2f2d; }
+.impact-status-needs-info { background: #fbf3db; color: #956400; }
+
+.impact-empty {
+  color: #787774 !important;
+  padding: 28px 12px !important;
+  text-align: center;
+}
+
+.impact-error {
+  background: #fdebec;
+  border: 1px solid #f0d1d0;
+  color: #9f2f2d;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+
+.sr-only {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  clip: rect(0, 0, 0, 0);
+}
+
+@media (max-width: 760px) {
+  .impact-heading { align-items: flex-start; flex-direction: column; }
+  .impact-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .impact-toolbar { align-items: flex-start; flex-direction: column; }
+  .impact-toolbar select { max-width: 100%; width: 100%; }
+}

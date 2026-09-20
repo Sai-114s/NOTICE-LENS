@@ -1,0 +1,25 @@
+{
+  "name": "noticelens",
+  "version": "1.0.0",
+  "description": "NoticeLens — College Notice → Action Engine",
+  "main": "index.js",
+  "scripts": {
+    "setup": "npm --prefix backend install && npm --prefix frontend install",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "npx concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test:python": "python -m unittest discover -s tests -v && python -m unittest discover -s eligibility_engine/tests -v && python -m unittest discover -s agent/tests -v",
+    "test": "npm run test:python && npm --prefix backend test"
+  },
+  "keywords": [
+    "hackathon",
+    "aws",
+    "firstcommit",
+    "agents"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

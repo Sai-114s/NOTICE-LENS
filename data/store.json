@@ -1,0 +1,234 @@
+{
+  "notices": [
+    {
+      "id": "tcs-digital-2026",
+      "title": "TCS Digital Hiring 2026",
+      "organization": "TCS",
+      "opportunityType": "Placement",
+      "criteria": {
+        "min_cgpa": 7.5,
+        "allowed_branches": [
+          "CSE",
+          "IT",
+          "ECE"
+        ],
+        "allowed_years": [
+          3,
+          4
+        ],
+        "max_backlogs": 0
+      },
+      "deadline": "23 September 2026, 5:00 PM",
+      "deadlineDays": 4,
+      "isUrgent": true,
+      "structuredNotice": {
+        "title": "TCS Digital Hiring 2026",
+        "organization": "TCS",
+        "type": null,
+        "description": "TCS Digital Hiring 2026\nOrganization: TCS\n\nEligibility:\nBranches: CSE, IT, ECE\nYears: 3rd and 4th year students\nMinimum CGPA: 7.5\nActive backlogs: 0 allowed\n\nRequired Documents:\n- Resume\n- College ID\n- 10th marksheet\n- 12th marksheet\n\nDeadline:\nApply by 23 September 2026, 5:00 PM",
+        "branches": [
+          "CSE",
+          "IT",
+          "ECE"
+        ],
+        "years": [
+          3,
+          4
+        ],
+        "min_cgpa": 7.5,
+        "max_active_backlogs": 0,
+        "min_10th_percentage": null,
+        "min_12th_percentage": null,
+        "required_degree": null,
+        "documents": [
+          "Resume",
+          "College ID",
+          "10th marksheet",
+          "12th marksheet"
+        ],
+        "deadline": "23 September 2026, 5:00 PM",
+        "application_url": null,
+        "application_method": null,
+        "instructions": [],
+        "contact": null
+      },
+      "status": "published"
+    },
+    {
+      "id": "tata-motors-get-2026",
+      "organization": "Tata Motors",
+      "title": "Graduate Engineer Trainee 2026",
+      "opportunityType": "Placement",
+      "shortDescription": "Graduate engineering trainee intake for vehicle chassis design, thermal powertrain testing, and electric mobility systems.",
+      "criteria": {
+        "min_cgpa": 6.8,
+        "allowed_branches": [
+          "Mechanical",
+          "Automobile",
+          "Production"
+        ],
+        "allowed_years": [
+          4
+        ],
+        "max_backlogs": 1,
+        "required_skills": [
+          "AutoCAD",
+          "Thermodynamics"
+        ]
+      },
+      "keyRequirementsText": [
+        "CGPA ≥ 6.8",
+        "Mechanical / Auto / Production",
+        "Final year (4th year)",
+        "Max 1 active backlog permitted"
+      ],
+      "deadline": "25 Sep, 11:59 PM",
+      "deadlineDays": 4,
+      "isUrgent": true,
+      "portalUrl": "https://tatamotors.com/careers/graduates",
+      "application_url": "https://tatamotors.com/careers/graduates"
+    },
+    {
+      "id": "sih-2026",
+      "organization": "Ministry of Education",
+      "title": "Smart India Hackathon 2026 — Internal Selection",
+      "opportunityType": "Hackathon",
+      "shortDescription": "Internal collegiate shortlisting round for nationwide problem statements across Smart Vehicles, MedTech, and Clean Energy.",
+      "criteria": {
+        "min_cgpa": 0,
+        "allowed_branches": [],
+        "allowed_years": [
+          2,
+          3,
+          4
+        ],
+        "max_backlogs": 99,
+        "required_skills": []
+      },
+      "keyRequirementsText": [
+        "All Engineering Branches",
+        "2nd, 3rd & 4th year students",
+        "No CGPA bar",
+        "Interdisciplinary teams of 6"
+      ],
+      "deadline": "27 Sep, 6:00 PM",
+      "deadlineDays": 6,
+      "isUrgent": false,
+      "portalUrl": "https://sih.gov.in",
+      "application_url": "https://sih.gov.in"
+    },
+    {
+      "id": "merit-scholarship-2026",
+      "organization": "State Higher Education Council",
+      "title": "Merit-cum-Means Academic Scholarship",
+      "opportunityType": "Scholarship",
+      "shortDescription": "Financial tuition fee waiver grant for academically disciplined engineering students. Requires authenticated income and grade transcripts.",
+      "criteria": {
+        "min_cgpa": 8,
+        "allowed_branches": [],
+        "allowed_years": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "max_backlogs": 0,
+        "required_skills": []
+      },
+      "keyRequirementsText": [
+        "CGPA ≥ 8.0",
+        "All Engineering Branches",
+        "All years eligible",
+        "0 active backlogs"
+      ],
+      "deadline": "30 Sep, 4:00 PM",
+      "deadlineDays": 9,
+      "isUrgent": false,
+      "application_url": null
+    },
+    {
+      "title": "TCS Digital Hiring 2026",
+      "organization": "TCS",
+      "type": null,
+      "description": "TCS Digital Hiring 2026\nOrganization: TCS\n\nEligibility:\nBranches: CSE, IT, ECE\nYears: 3rd and 4th year students\nMinimum CGPA: 7.5\nActive backlogs: 0 allowed\n\nRequired Documents:\n- Resume\n- College ID\n- 10th marksheet\n- 12th marksheet\n\nDeadline:\nApply by 23 September 2026, 5:00 PM",
+      "branches": [
+        "CSE",
+        "IT",
+        "ECE"
+      ],
+      "years": [
+        3,
+        4
+      ],
+      "min_cgpa": 7.5,
+      "max_active_backlogs": 0,
+      "min_10th_percentage": null,
+      "min_12th_percentage": null,
+      "required_degree": null,
+      "documents": [
+        "Resume",
+        "College ID",
+        "10th marksheet",
+        "12th marksheet"
+      ],
+      "deadline": "23 September 2026, 5:00 PM",
+      "application_url": null,
+      "application_method": null,
+      "instructions": [],
+      "contact": null,
+      "id": "2bc2a02c-d79e-439b-9ef2-fc62f97d5e07",
+      "status": "draft"
+    }
+  ],
+  "audit_logs": [],
+  "students": [
+    {
+      "id": "rahul-sharma",
+      "name": "Rahul Sharma",
+      "role": "Student",
+      "branch": "CSE",
+      "branchFullName": "Computer Science & Engineering",
+      "year": 3,
+      "cgpa": 8.2,
+      "active_backlogs": 0,
+      "tenth_percentage": 88,
+      "twelfth_percentage": 84,
+      "degree": "B.Tech",
+      "statusText": "All Academic Records Verified",
+      "avatarLetter": "RS",
+      "actionItems": {
+        "tcs-digital-2026": {
+          "action-0": true
+        }
+      }
+    },
+    {
+      "id": "arjun-kumar",
+      "name": "Arjun Kumar",
+      "role": "Student",
+      "branch": "Mechanical",
+      "branchFullName": "Mechanical Engineering",
+      "year": 3,
+      "cgpa": 8.5,
+      "active_backlogs": 0,
+      "degree": "B.Tech",
+      "statusText": "Academic Records Verified",
+      "avatarLetter": "AK",
+      "actionItems": {}
+    },
+    {
+      "id": "priya-singh",
+      "name": "Priya Singh",
+      "role": "Student",
+      "branch": "CSE",
+      "branchFullName": "Computer Science & Engineering",
+      "year": 3,
+      "cgpa": 8.2,
+      "active_backlogs": null,
+      "degree": "B.Tech",
+      "statusText": "Academic Records Pending Verification",
+      "avatarLetter": "PS",
+      "actionItems": {}
+    }
+  ]
+}
