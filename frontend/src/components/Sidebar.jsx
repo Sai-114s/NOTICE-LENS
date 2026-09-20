@@ -23,13 +23,17 @@ export const Sidebar = ({
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notices', label: 'Notices', icon: FileText },
     { id: 'profile', label: 'My Profile', icon: UserCheck },
-    {
-      id: 'admin',
-      label: isAdmin ? 'Admin Panel' : 'Admin Panel',
-      icon: ShieldCheck,
-      badge: isAdmin ? 'Active' : 'Admin Only',
-      badgeClass: isAdmin ? 'active-admin' : ''
-    }
+    ...(isAdmin
+      ? [
+          {
+            id: 'admin',
+            label: 'Admin Panel',
+            icon: ShieldCheck,
+            badge: 'Active',
+            badgeClass: 'active-admin'
+          }
+        ]
+      : [])
   ];
 
   return (
