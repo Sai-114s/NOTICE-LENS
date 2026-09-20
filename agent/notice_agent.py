@@ -102,21 +102,35 @@ def extract_text_from_file(file_path: str) -> str:
         if not path.is_file() or path.stat().st_size == 0 or path.stat().st_size > MAX_NOTICE_FILE_BYTES:
             raise NoticeExtractionError("Notice file is missing, empty, or exceeds the 10 MB limit")
         if suffix in {".txt", ".md", ".csv"}:
-            text = path.read_text(encoding="utf-8")
+            try:
+                text = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                try:
+                    text = path.read_text(encoding="utf-8-sig")
+                except UnicodeDecodeError:
+                    text = path.read_text(encoding="latin-1", errors="replace")
         elif suffix == ".pdf":
             try:
                 # pyrefly: ignore [missing-import]
                 from pypdf import PdfReader
             except ImportError as error:
-                raise NoticeExtractionError("PDF extraction requires the local pypdf dependency") from error
-            text = "\n".join(page.extract_text() or "" for page in PdfReader(path).pages)
+                raise NoticeExtractionError("PDF extraction requires the local pypdf dependency (pip install pypdf)") from error
+            try:
+                reader = PdfReader(str(path))
+                pages_text = [page.extract_text() or "" for page in reader.pages]
+                text = "\n\n".join(p.strip() for p in pages_text if p.strip())
+            except Exception as pdf_err:
+                raise NoticeExtractionError(f"Unable to parse PDF contents: {str(pdf_err)}") from pdf_err
         else:
             try:
                 from PIL import Image
                 import pytesseract
             except ImportError as error:
                 raise NoticeExtractionError("Image extraction requires local Pillow and pytesseract dependencies") from error
-            text = pytesseract.image_to_string(Image.open(path))
+            try:
+                text = pytesseract.image_to_string(Image.open(path))
+            except Exception as ocr_err:
+                raise NoticeExtractionError(f"Image OCR extraction requires Tesseract binary on system PATH: {str(ocr_err)}") from ocr_err
         if not text or not text.strip():
             raise NoticeExtractionError("No readable text was found in the uploaded notice")
         return text
@@ -188,6 +202,13 @@ class NoticeAgent:
         deadline = re.search(r"\b(?:apply\s+)?(?:before|by|deadline[:\s]+)\s+([^\n.!]+)", text, re.I)
         if deadline:
             result["deadline"] = deadline.group(0).strip()
+        for k in FIELDS:
+            if isinstance(result[k], str):
+                cleaned_val = result[k].strip()
+                result[k] = cleaned_val if cleaned_val else None
+            elif isinstance(result[k], list):
+                result[k] = [item.strip() for item in result[k] if isinstance(item, str) and item.strip()]
+
         return result
 
     def _strands_extract(self, raw_text: str) -> Dict[str, Any]:

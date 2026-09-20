@@ -31,7 +31,16 @@ function extractNotice({ rawText, filePath }) {
         pythonProcess.on('close', (code) => {
             if (filePath) fs.rm(filePath, { force: true }, () => {});
             if (code !== 0) {
-                return reject(new Error(`Local notice agent exited with code ${code}`));
+                let detail = '';
+                try {
+                    const parsed = JSON.parse(errorOutput);
+                    detail = parsed.error;
+                } catch {
+                    detail = errorOutput.trim();
+                }
+                const message = detail || `Local notice agent exited with code ${code}`;
+                console.error(`Local notice agent error (exit code ${code}):`, message);
+                return reject(new Error(message));
             }
             try {
                 const result = JSON.parse(output);
