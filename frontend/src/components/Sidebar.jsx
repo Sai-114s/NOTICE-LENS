@@ -15,13 +15,21 @@ export const Sidebar = ({
   currentView = 'dashboard',
   onSelectView,
   isOpen = false,
-  onClose
+  onClose,
+  currentProfile
 }) => {
+  const isAdmin = currentProfile?.role === 'Admin';
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notices', label: 'Notices', icon: FileText },
     { id: 'profile', label: 'My Profile', icon: UserCheck },
-    { id: 'admin', label: 'Admin', icon: ShieldCheck }
+    {
+      id: 'admin',
+      label: isAdmin ? 'Admin Panel' : 'Admin Panel',
+      icon: ShieldCheck,
+      badge: isAdmin ? 'Active' : 'Admin Only',
+      badgeClass: isAdmin ? 'active-admin' : ''
+    }
   ];
 
   return (
@@ -59,6 +67,9 @@ export const Sidebar = ({
                   <Icon size={18} strokeWidth={isActive ? 2.2 : 1.7} />
                 </span>
                 <span>{item.label}</span>
+                {item.badge && (
+                  <span className={`nav-role-badge ${item.badgeClass || ''}`}>{item.badge}</span>
+                )}
               </button>
             );
           })}

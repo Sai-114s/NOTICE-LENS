@@ -7,7 +7,16 @@ async function request(url, options = {}) {
   return data;
 }
 
+let currentRole = 'Student';
+
+export function setActiveRole(role) {
+  currentRole = role;
+}
+
 const adminHeaders = () => {
+  if (currentRole !== 'Admin') {
+    return {};
+  }
   const token = import.meta.env.VITE_ADMIN_TOKEN;
   return token ? { 'X-Admin-Token': token } : {};
 };

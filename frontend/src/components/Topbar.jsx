@@ -66,8 +66,46 @@ export const Topbar = ({
 
           {dropdownOpen && (
             <div className="profile-dropdown" role="listbox">
-              <div className="dropdown-header">Switch Student Context</div>
-              {profiles.map((profile) => {
+              <div className="dropdown-header">Switch Role & User Context</div>
+
+              {profiles.filter((p) => p.role === 'Admin').length > 0 && (
+                <>
+                  <div className="dropdown-group-header">Administrator</div>
+                  {profiles.filter((p) => p.role === 'Admin').map((profile) => {
+                    const isSelected = profile.id === currentProfile?.id;
+                    return (
+                      <button
+                        key={profile.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`profile-option ${isSelected ? 'active' : ''}`}
+                        onClick={() => {
+                          onSelectProfile(profile);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <div className="profile-option-left">
+                          <div className="option-avatar" style={{ backgroundColor: '#1E293B', color: '#FFFFFF' }}>
+                            {profile.avatarLetter || 'AU'}
+                          </div>
+                          <div>
+                            <div className="option-name">
+                              {profile.name}
+                              <span className="dropdown-role-chip admin">Admin</span>
+                            </div>
+                            <div className="option-meta">{profile.branch || 'Admin Panel'}</div>
+                          </div>
+                        </div>
+                        {isSelected && <Check size={14} style={{ color: 'var(--color-brand-primary)' }} />}
+                      </button>
+                    );
+                  })}
+                </>
+              )}
+
+              <div className="dropdown-group-header">Students</div>
+              {profiles.filter((p) => p.role !== 'Admin').map((profile) => {
                 const isSelected = profile.id === currentProfile?.id;
                 return (
                   <button
@@ -84,7 +122,10 @@ export const Topbar = ({
                     <div className="profile-option-left">
                       <div className="option-avatar">{profile.avatarLetter}</div>
                       <div>
-                        <div className="option-name">{profile.name}</div>
+                        <div className="option-name">
+                          {profile.name}
+                          <span className="dropdown-role-chip student">Student</span>
+                        </div>
                         <div className="option-meta">
                           {profile.branch} {profile.year ? `· Year ${profile.year}` : ''}
                         </div>

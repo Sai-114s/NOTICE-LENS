@@ -11,7 +11,22 @@ import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import { getStudents, getStudentById } from '../services/studentService';
 import { getStudentDashboardData, getEvaluatedNoticeForStudent } from '../services/eligibilityService';
-import { Shield, FileText } from 'lucide-react';
+import { Shield, FileText, ShieldAlert } from 'lucide-react';
+import { setActiveRole } from '../services/noticeService';
+
+const ADMIN_USER = {
+  id: 'admin-user',
+  name: 'Admin User',
+  role: 'Admin',
+  branch: 'Admin Panel',
+  branchFullName: 'Office of Dean Academic Affairs & Placement Cell',
+  year: null,
+  cgpa: null,
+  active_backlogs: null,
+  semester: null,
+  statusText: 'Notice Ingestion & Publishing Authority',
+  avatarLetter: 'AU'
+};
 
 export const AppShell = () => {
   const [profiles, setProfiles] = useState([]);
@@ -31,11 +46,14 @@ export const AppShell = () => {
       .then((data) => {
         if (!active) return;
         const students = (data.students || []).filter((student) => student.role === 'Student' && student.name);
-        setProfiles(students);
+        setProfiles([...students, ADMIN_USER]);
         if (students.length > 0) {
-          const selectedId = students[0].id;
-          getStudentById(selectedId).then((profileData) => {
-            if (active && profileData?.student) setCurrentProfile(profileData.student);
+          const rahul = students.find((s) => s.id === 'rahul-sharma') || students[0];
+          getStudentById(rahul.id).then((profileData) => {
+            if (active && profileData?.student) {
+              setCurrentProfile(profileData.student);
+              setActiveRole('Student');
+            }
           });
         }
       })
@@ -145,9 +163,24 @@ export const AppShell = () => {
 
   const handleProfileSelect = async (newProfile) => {
     try {
+      if (newProfile.role === 'Admin') {
+        setActiveRole('Admin');
+        setCurrentProfile(ADMIN_USER);
+        setSelectedNoticeId(null);
+        setSelectedNoticeDetail(null);
+        setCurrentView('admin');
+        window.history.pushState({}, '', '/admin');
+        return;
+      }
+      setActiveRole('Student');
       const profileData = await getStudentById(newProfile.id);
       setCurrentProfile(profileData.student);
-      if (selectedNoticeId) navigateToNotice(selectedNoticeId, profileData.student);
+      if (currentView === 'admin') {
+        setCurrentView('dashboard');
+        window.history.pushState({}, '', '/student/dashboard');
+      } else if (selectedNoticeId) {
+        navigateToNotice(selectedNoticeId, profileData.student);
+      }
     } catch (error) {
       setProfilesError(error.message || 'Unable to load the selected student profile');
     }
@@ -165,6 +198,7 @@ export const AppShell = () => {
         }}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        currentProfile={currentProfile}
       />
 
       <div className="main-wrapper">
@@ -324,52 +358,87 @@ export const AppShell = () => {
 
           {/* ================= VIEW 5: ADMIN ================= */}
           {currentView === 'admin' && (
-            <div>
-              <div className="admin-nav-tabs" role="tablist" aria-label="Admin Navigation Tabs">
-                <button
-                  type="button"
-                  role="tab"
-                  id="admin-tab-notices"
-                  aria-controls="admin-panel-notices"
-                  aria-selected={adminTab === 'notices'}
-                  className={`admin-nav-tab-btn ${adminTab === 'notices' ? 'active' : ''}`}
-                  onClick={() => setAdminTab('notices')}
-                >
-                  <FileText size={15} />
-                  <span>Notice Management</span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  id="admin-tab-impact"
-                  aria-controls="admin-panel-impact"
-                  aria-selected={adminTab === 'impact'}
-                  className={`admin-nav-tab-btn ${adminTab === 'impact' ? 'active' : ''}`}
-                  onClick={() => setAdminTab('impact')}
-                >
-                  <Shield size={15} />
-                  <span>Cohort Impact Analysis</span>
-                </button>
+            currentProfile.role === 'Student' ? (
+              <div className="admin-restricted-shell">
+                <div className="admin-restricted-card">
+                  <div className="admin-restricted-icon">
+                    <ShieldAlert size={36} />
+                  </div>
+                  <h2>Admin Panel Restricted</h2>
+                  <div className="admin-restricted-pill">
+                    Active Profile: <strong>{currentProfile.name}</strong> · Student
+                  </div>
+                  <div className="admin-restricted-box">
+                    <p><strong>Students cannot upload or publish college notices.</strong></p>
+                    <p>Notice creation, file ingestion, fact extraction, and publishing are strictly restricted to administrative staff.</p>
+                  </div>
+                  <p className="admin-restricted-instruction">
+                    To access the Admin Panel, upload notice files, review requirements, and publish opportunities for students, switch to the <strong>Admin User</strong> profile.
+                  </p>
+                  <button
+                    type="button"
+                    className="admin-restricted-switch-btn"
+                    onClick={() => handleProfileSelect(ADMIN_USER)}
+                  >
+                    <Shield size={16} />
+                    <span>Switch to Admin User</span>
+                  </button>
+                </div>
               </div>
+            ) : (
+              <div>
+                <div className="admin-nav-tabs" role="tablist" aria-label="Admin Navigation Tabs">
+                  <button
+                    type="button"
+                    role="tab"
+                    id="admin-tab-notices"
+                    aria-controls="admin-panel-notices"
+                    aria-selected={adminTab === 'notices'}
+                    className={`admin-nav-tab-btn ${adminTab === 'notices' ? 'active' : ''}`}
+                    onClick={() => setAdminTab('notices')}
+                  >
+                    <FileText size={15} />
+                    <span>Notice Management</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    id="admin-tab-impact"
+                    aria-controls="admin-panel-impact"
+                    aria-selected={adminTab === 'impact'}
+                    className={`admin-nav-tab-btn ${adminTab === 'impact' ? 'active' : ''}`}
+                    onClick={() => setAdminTab('impact')}
+                  >
+                    <Shield size={15} />
+                    <span>Cohort Impact Analysis</span>
+                  </button>
+                </div>
 
-              <div
-                id="admin-panel-notices"
-                role="tabpanel"
-                aria-labelledby="admin-tab-notices"
-                style={{ display: adminTab === 'notices' ? 'block' : 'none' }}
-              >
-                <AdminNoticeManager onNavigateImpact={() => setAdminTab('impact')} />
-              </div>
+                <div
+                  id="admin-panel-notices"
+                  role="tabpanel"
+                  aria-labelledby="admin-tab-notices"
+                  style={{ display: adminTab === 'notices' ? 'block' : 'none' }}
+                >
+                  <AdminNoticeManager
+                    onNavigateImpact={() => setAdminTab('impact')}
+                    onViewAsStudent={() => {
+                      const rahul = profiles.find((p) => p.id === 'rahul-sharma') || profiles[0];
+                      handleProfileSelect(rahul);
+                    }}
+                  />
+                </div>
 
-              <div
-                id="admin-panel-impact"
-                role="tabpanel"
-                aria-labelledby="admin-tab-impact"
-                style={{ display: adminTab === 'impact' ? 'block' : 'none' }}
-              >
-                <AdminImpactAnalysis />
+                <div
+                  id="admin-panel-impact"
+                  role="tabpanel"
+                  aria-labelledby="admin-tab-impact"
+                  style={{ display: adminTab === 'impact' ? 'block' : 'none' }}
+                >
+                  <AdminImpactAnalysis />
+                </div>
               </div>
-            </div>
+            )
           )}
           </>}
         </main>

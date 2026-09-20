@@ -89,7 +89,7 @@ function mimeForFile(file) {
   return { '.pdf': 'application/pdf', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.txt': 'text/plain' }[extension] || '';
 }
 
-export const AdminNoticeManager = ({ onNavigateImpact }) => {
+export const AdminNoticeManager = ({ onNavigateImpact, onViewAsStudent }) => {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [textPreview, setTextPreview] = useState('');
@@ -323,16 +323,27 @@ export const AdminNoticeManager = ({ onNavigateImpact }) => {
             <p className="admin-published-text">
               The notice has been published. Deterministic eligibility rules are now actively evaluating against all institutional student records.
             </p>
-            {onNavigateImpact && (
-              <button
-                type="button"
-                className="admin-primary-button"
-                onClick={onNavigateImpact}
-                style={{ marginTop: '14px' }}
-              >
-                <span>View Cohort Impact Analysis →</span>
-              </button>
-            )}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap' }}>
+              {onViewAsStudent && (
+                <button
+                  type="button"
+                  className="admin-secondary-button"
+                  onClick={onViewAsStudent}
+                >
+                  <Icon name="check" size={14} />
+                  <span>View as Rahul Sharma (Student) →</span>
+                </button>
+              )}
+              {onNavigateImpact && (
+                <button
+                  type="button"
+                  className="admin-primary-button"
+                  onClick={onNavigateImpact}
+                >
+                  <span>View Cohort Impact Analysis →</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
 
