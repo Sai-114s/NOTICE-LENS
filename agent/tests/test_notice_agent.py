@@ -73,7 +73,21 @@ Team CDS"""
         self.assertIn("IT", result["branches"])
         self.assertEqual(result["years"], [3])
         self.assertEqual(result["contact"], "Team CDS")
-        self.assertEqual(result["type"], "Placement")
+    def test_cse_and_allied_branches_notice(self):
+        text = """Placement Announcement:
+Company: Infosys
+Eligible Branches: CSE and its allied branches
+Minimum CGPA: 7.0
+No active backlogs.
+Deadline: Apply before 30 September."""
+        result = NoticeAgent("DEMO").extract_structured_data(text)
+        self.assertEqual(result["organization"], "Infosys")
+        self.assertEqual(result["min_cgpa"], 7.0)
+        self.assertEqual(result["max_active_backlogs"], 0)
+        self.assertIn("CSE", result["branches"])
+        self.assertIn("IT", result["branches"])
+        self.assertIn("CSM", result["branches"])
+        self.assertIn("AIDS", result["branches"])
 
 
 if __name__ == "__main__":

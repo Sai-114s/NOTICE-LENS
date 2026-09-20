@@ -248,25 +248,87 @@ class NoticeAgent:
                     result["max_active_backlogs"] = int(inline_num.group(1))
 
         # 7. Branches
-        branches_match = re.search(r"(?:^|\n)\s*(?:eligible\s+|allowed\s+)?(?:branches?|departments?)\s*:\s*([^\n.]+)", text, re.I)
+        allied_branches = ["CSE", "IT", "CSM", "AIDS", "AIML", "CSD"]
+        circuit_branches = ["CSE", "IT", "ECE", "EEE"]
+
+        has_allied_mention = bool(re.search(
+            r"\b(?:cse|computer\s+science)(?:\s*,|\s+and|\s*&)?\s*(?:its\s+)?allied\s+branches?\b|"
+            r"\ballied\s+branches?\s+of\s+(?:cse|computer\s+science)\b|"
+            r"\bbranches?\s*:\s*.*?\b(?:its\s+)?allied\b",
+            text,
+            re.I
+        ))
+
+        branches_match = re.search(
+            r"(?:^|\n)\s*(?:eligible\s+|allowed\s+)?(?:branches?|departments?|discipline|courses?)\s*:\s*([^\n.]+)",
+            text,
+            re.I
+        )
+        if not branches_match:
+            elig_branch_match = re.search(
+                r"(?:^|\n)\s*eligibility\s*:\s*(?:open\s+(?:for|to)\s+)?([^\n.]+?)(?:,\s*min|\s*with|\s*;\s*|\n|$)",
+                text,
+                re.I
+            )
+            if elig_branch_match and re.search(r"\b(?:branch|branches|cse|it|ece|csm|aids|mech|civil|allied)\b", elig_branch_match.group(1), re.I):
+                branches_match = elig_branch_match
+
+        items = []
         if branches_match:
             raw_branches = branches_match.group(1).strip()
-            items = []
             for part in re.split(r"\s*(?:,|and|/)\s*", raw_branches):
-                part = part.strip()
+                part = part.strip().strip(". ")
                 if not part:
                     continue
-                items.append(part)
+                if re.search(r"^(?:its\s+)?allied\s+branches?$", part, re.I):
+                    if "Allied" not in items:
+                        items.append("Allied")
+                elif re.search(r"^all\s+(?:engineering\s+)?branches?$", part, re.I):
+                    if "All" not in items:
+                        items.append("All")
+                else:
+                    if part not in items:
+                        items.append(part)
                 if "&" in part:
                     for sub in part.split("&"):
-                        sub = sub.strip()
+                        sub = sub.strip().strip(". ")
                         if sub and sub not in items:
                             items.append(sub)
-            result["branches"] = items
         else:
             branches_inline = re.search(r"\bbranches?\s*:\s*([^\n.]+)", text, re.I)
             if branches_inline:
-                result["branches"] = [item.strip() for item in re.split(r"\s*(?:,|and)\s*", branches_inline.group(1)) if item.strip()]
+                for item in re.split(r"\s*(?:,|and)\s*", branches_inline.group(1)):
+                    item = item.strip().strip(". ")
+                    if item and item not in items:
+                        items.append(item)
+
+        if has_allied_mention or any(re.search(r"\ballied\b", b, re.I) for b in items):
+            for ab in allied_branches:
+                if ab not in items:
+                    items.append(ab)
+            if "Allied" not in items:
+                items.append("Allied")
+
+        if bool(re.search(r"\bcircuit\s+branches?\b", text, re.I)):
+            for cb in circuit_branches:
+                if cb not in items:
+                    items.append(cb)
+
+        if not items:
+            open_for = re.search(r"\bopen\s+(?:only\s+)?(?:for|to)\s+([^\n.]+?)(?:students|batch|\.|\n)", text, re.I)
+            if open_for and re.search(r"\b(?:cse|it|ece|csm|aids|allied)\b", open_for.group(1), re.I):
+                raw_b = open_for.group(1)
+                for part in re.split(r"\s*(?:,|and|/)\s*", raw_b):
+                    part = part.strip().strip(". ")
+                    if part and re.search(r"\b(?:cse|it|ece|csm|aids|mech|civil|allied)\b", part, re.I):
+                        if part not in items:
+                            items.append(part)
+                if has_allied_mention:
+                    for ab in allied_branches:
+                        if ab not in items:
+                            items.append(ab)
+
+        result["branches"] = items
 
         # 8. Years / Batch
         years_found = set()
