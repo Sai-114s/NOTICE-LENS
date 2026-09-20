@@ -1,42 +1,114 @@
 # NoticeLens — College Notice → Action Engine
 
-NoticeLens turns a messy college notice into reviewed, personalized student actions. It is a local-only AWS First Commit Build It submission. The central rule is simple: **Strands extracts facts; deterministic Python rules determine eligibility.**
+NoticeLens turns a messy college notice into reviewed, personalized student actions. It is a local-only AWS First Commit **Build It** submission. The central rule is simple: **Strands extracts facts; deterministic Python rules determine eligibility.**
 
 ## 1. Problem
 
-College notices are often long, inconsistent documents. Students can miss eligibility requirements, deadlines, or required documents, while staff must repeatedly interpret the same notice for different student records.
+College notices are often long, inconsistent documents. Students miss eligibility requirements, deadlines, and required documents, while staff must repeatedly interpret the same notice for different student records.
 
 ## 2. Solution
 
-NoticeLens accepts notice text or a supported local document, extracts a closed structured-requirements object, requires an admin review before publication, and evaluates the published requirements against student records. Each student sees a result, the requirement-by-requirement explanation, the deadline, and an actionable checklist.
+NoticeLens accepts notice text or a supported local document, extracts a closed structured-requirements object, requires an admin review before publication, and evaluates the published requirements against student records. Each student sees their eligibility result, a requirement-by-requirement explanation, the deadline with urgency cues, and an actionable checklist whose completion state persists across reloads.
 
 ## 3. Architecture
 
 ```text
-Messy notice document/text
-          ↓
-Local text/PDF/image extraction
-          ↓
-Local Strands agent + Ollama model
-          ↓
-Structured Notice JSON
-          ↓
-Closed-schema validation
-          ↓
-Admin review and publish gate
-          ↓
-Node/Express local API + data/store.json
-          ↓
-Python deterministic eligibility engine
-          ↓
-Personalized result + action plan
+Messy notice document / pasted text
+            ↓
+Local text / PDF / image extraction  (pypdf, Pillow, pytesseract)
+            ↓
+AWS Strands Agent + local Ollama model  ──OR──  DEMO_MODE fallback
+            ↓
+Structured Notice JSON  (agent/notice_schema.json — 17 fields, closed schema)
+            ↓
+Closed-schema JSON validation
+            ↓
+Admin review / edit gate  →  Draft saved to data/store.json
+            ↓
+Explicit Publish action
+            ↓
+Node/Express API  (routes: /api/notices, /api/students, /api/eligibility)
+            ↓
+Python deterministic eligibility engine  (spawn child process, arg arrays)
+            ↓
+Personalized result  (eligible | not_eligible | needs_information)
+  + requirement-by-requirement reasons
+  + action plan
+  + deadline urgency metadata
 ```
 
-The React/Vite frontend calls the Node/Express backend. The backend calls the Python engine through an argument-based child process bridge. Eligibility is never calculated in React and is never delegated to an LLM.
+The React/Vite frontend calls the Node/Express backend. The backend calls the Python engine through a `spawn`-based child-process bridge (no shell injection). Eligibility is **never** calculated in React and is **never** delegated to an LLM.
 
-## 4. Local setup
+## 4. Repository Layout
 
-Prerequisites: Node.js, npm, Python 3.10 or newer, and PowerShell, cmd, or a Unix shell. The repository includes the demo data in `data/store.json`.
+```
+noticelens/
+├── agent/                              # Strands extraction layer
+│   ├── cli.py                          # Entry point: python -m agent.cli
+│   ├── notice_agent.py                 # Strands agent definition + tool calls
+│   ├── notice_schema.json              # 17-field closed JSON schema
+│   ├── requirements.txt                # strands-agents, ollama, …
+│   └── tests/
+├── backend/                            # Node/Express API
+│   ├── server.js                       # App entry, route mounts, global error handler
+│   ├── controllers/                    # Request handlers
+│   ├── middleware/                     # requestLogger, errorHandler
+│   ├── models/                         # Data access over data/store.json
+│   ├── routes/
+│   │   ├── notices.js                  # /api/notices
+│   │   ├── students.js                 # /api/students
+│   │   └── eligibility.js             # /api/eligibility
+│   ├── services/                       # engineBridge (spawn), extraction, …
+│   ├── utils/
+│   │   └── deadline.js                 # parseDeadline(), urgency labels
+│   ├── .env.example
+│   └── tests/
+├── data/
+│   └── store.json                      # Local JSON persistence (notices + students + action state)
+├── eligibility_engine/                 # Deterministic Python evaluation
+│   ├── eligibility.py                  # evaluate_eligibility() — only eligibility source of truth
+│   ├── models.py                       # NoticeCriteria, StudentProfile, EligibilityResult
+│   ├── cli.py                          # CLI bridge called by engineBridge
+│   ├── requirements.txt
+│   └── tests/
+├── frontend/                           # React 19 + Vite
+│   └── src/
+│       ├── components/
+│       │   ├── AppShell.jsx            # Top-level layout, routing, profile switching
+│       │   ├── StudentDashboard.jsx    # Notice list, filters, search, status counts
+│       │   ├── NoticeCard.jsx          # Card: org, title, type, requirements, deadline, status, "Why?"
+│       │   ├── NoticeDetailView.jsx    # Full eligibility breakdown + persistent action plan
+│       │   ├── NoticeSearch.jsx        # Search input with debounce
+│       │   ├── AdminDashboard.jsx      # Admin hub
+│       │   ├── AdminNoticeManager.jsx  # Upload / paste / extract / review / edit / publish
+│       │   ├── AdminImpactAnalysis.jsx # Batch eligibility across all demo students
+│       │   ├── NoticeExtractionPanel.jsx
+│       │   ├── RequirementRow.jsx
+│       │   ├── StatusBadge.jsx
+│       │   ├── DeadlineBadge.jsx
+│       │   ├── ActionItem.jsx
+│       │   ├── StatCard.jsx
+│       │   ├── Sidebar.jsx
+│       │   ├── Topbar.jsx
+│       │   ├── LoadingState.jsx
+│       │   ├── EmptyState.jsx
+│       │   └── ErrorState.jsx
+│       ├── services/
+│       │   └── actionItemService.js    # PATCH action-item completion
+│       ├── utils/
+│       └── index.css                   # Full design system (custom properties, tokens)
+├── sample-data/
+│   └── sample_notices/
+│       └── placement_drive.txt
+├── tests/
+│   ├── test_eligibility.py             # Cross-cutting eligibility tests
+│   └── test_api_health.js              # Backend health check smoke test
+└── package.json                        # Root: npm run dev, npm test, npm run setup
+```
+
+## 5. Local Setup
+
+**Prerequisites:** Node.js ≥ 18, npm, Python 3.10+, and PowerShell, cmd, or a Unix shell. The repository includes demo data in `data/store.json`.
 
 ```bash
 npm install
@@ -50,41 +122,67 @@ Copy-Item backend/.env.example backend/.env
 Copy-Item frontend/.env.example frontend/.env
 ```
 
-The example values are local demo tokens, not production secrets. Keep `.env` files uncommitted. Then start the application:
+The example values are local demo tokens, not production secrets. Keep `.env` files uncommitted. Then start:
 
 ```bash
 npm run dev
 ```
 
-The frontend runs at `http://localhost:5173` and the backend at `http://localhost:5000`. For a deterministic demo without a local model, `backend/.env` uses `DEMO_MODE=true`. To use real Strands extraction, follow the Strands section below and change `DEMO_MODE=false`.
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:5173 |
+| Backend  | http://localhost:5000 |
+| Health   | http://localhost:5000/api/health |
 
-Run the repository tests:
+`DEMO_MODE=true` in `backend/.env` enables a deterministic fallback requiring no model. To use real Strands extraction, see §8 and set `DEMO_MODE=false`.
+
+## 6. Running Tests
 
 ```bash
+# Python: root-level, eligibility engine, and agent tests + backend JS tests
 npm test
+
+# Frontend lint + production build check
 npm --prefix frontend run lint
 npm --prefix frontend run build
 ```
 
-There is no frontend unit-test script in this repository; the frontend build and live browser flow are the available frontend checks.
+| File | Coverage |
+|------|----------|
+| `tests/test_eligibility.py` | Cross-cutting eligibility scenarios |
+| `eligibility_engine/tests/` | Engine unit tests |
+| `agent/tests/` | Agent / schema tests |
+| `tests/test_api_health.js` | Backend health-check smoke test |
+| `backend/tests/` | Backend integration tests |
 
-## 5. Technology stack
+There is no dedicated frontend unit-test script; the build and live browser flow are the available frontend checks.
 
-- React 19 and Vite for the local frontend.
-- Node.js and Express for the local HTTP API.
-- Python 3 for the deterministic eligibility engine and notice extraction CLI.
-- AWS Strands Agents SDK with Ollama, only in real local extraction mode.
-- `pypdf`, Pillow, and pytesseract for optional local document text extraction.
-- `data/store.json` for local notices, students, and action-item state.
-- No database, cloud storage, hosted model API, or deployment service is implemented.
+## 7. Technology Stack
 
-## 6. Strands usage
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, Vite, Lucide React icons |
+| Backend | Node.js, Express, cors, dotenv |
+| Persistence | `data/store.json` (local JSON) |
+| Eligibility engine | Python 3 — deterministic rules only |
+| Notice extraction | AWS Strands Agents SDK + local Ollama (`llama3.2`) |
+| Document parsing | `pypdf`, Pillow, pytesseract (optional OCR) |
+| Process bridge | Node `child_process.spawn` with arg arrays |
+| Dev tooling | concurrently, ESLint |
 
-Strands has one job: extract structured facts from an untrusted notice. It returns the fields defined in `agent/notice_schema.json`, and the result is validated before the application can save or publish it.
+No database, cloud storage, hosted model API, or deployment service is implemented.
 
-Strands does **not** decide eligibility, publish notices, modify files, execute notice instructions, run arbitrary commands, or receive access to secrets. The prompt treats notice content as quoted untrusted data. The application labels real output **“Extracted by local Strands agent.”**
+## 8. Strands Usage
 
-Real local mode:
+Strands has **one job**: extract structured facts from an untrusted notice. It returns the 17 fields defined in `agent/notice_schema.json`, and the result is validated against that closed schema before the application can save or publish it.
+
+**Strands does NOT**: decide eligibility, publish notices, modify files, execute notice instructions, run arbitrary commands, or receive access to secrets. The prompt treats notice content as quoted untrusted data. Real Strands output is labeled **"Extracted by local Strands agent."**
+
+### notice_schema.json fields
+
+`title`, `organization`, `type`, `description`, `branches`, `years`, `min_cgpa`, `max_active_backlogs`, `min_10th_percentage`, `min_12th_percentage`, `required_degree`, `documents`, `deadline`, `application_url`, `application_method`, `instructions`, `contact`
+
+### Real local extraction
 
 ```bash
 pip install -r agent/requirements.txt
@@ -93,69 +191,106 @@ ollama pull llama3.2
 python -m agent.cli --mode STRANDS --file sample-data/sample_notices/placement_drive.txt
 ```
 
-`OLLAMA_HOST` is restricted to `localhost`, `127.0.0.1`, or `::1`. The current sample notice is intentionally small and does not contain every possible field; admin review is where missing or ambiguous facts are corrected.
+`OLLAMA_HOST` is restricted to `localhost`, `127.0.0.1`, or `::1`. If Strands or Ollama is unavailable, set `DEMO_MODE=true`. The fallback is visibly labeled **"DEMO_MODE fallback (not Strands execution)"** — that label must not be changed to imply Strands was used.
 
-If Strands or Ollama is unavailable, set `DEMO_MODE=true`. The fallback is deliberately conservative and is visibly labeled **“DEMO_MODE fallback (not Strands execution)”**. That label is truthful and must not be changed to imply Strands was used.
+## 9. Eligibility Engine
 
-## 7. Eligibility engine
+`eligibility_engine/eligibility.py` is the **only** eligibility source of truth. `evaluate_eligibility(criteria, student)` evaluates a `NoticeCriteria` object against a `StudentProfile` and returns an `EligibilityResult`.
 
-The Python engine in `eligibility_engine/` is the only eligibility source of truth. It evaluates structured notice criteria plus a student profile and returns `eligible`, `not_eligible`, or `needs_information`, with reasons and missing fields.
+### Criteria evaluated (in order)
 
-```text
-student profile + published structured notice
-                    ↓
-       Python deterministic rules
-                    ↓
-       status, reasons, action items
+| Criterion | Schema field |
+|-----------|-------------|
+| Branch | `eligible_branches` — with CSE-allied branch expansion |
+| Year | `eligible_years` |
+| Degree | `eligible_degrees` |
+| CGPA | `min_cgpa` |
+| Active backlogs | `max_active_backlogs` |
+| 10th percentage | `min_tenth_percentage` |
+| 12th percentage | `min_twelfth_percentage` |
+
+### Status logic
+
+```
+any criterion failed              →  not_eligible
+all pass, some data missing       →  needs_information
+all pass, no data missing         →  eligible
 ```
 
 The LLM is not in this decision loop. The Admin Impact Analysis view calls the same backend evaluation service for every demo student; it does not implement a second ruleset.
 
-## 8. Student experience
+## 10. API Routes
 
-Students can switch among the demo profiles Rahul Sharma, Arjun Kumar, and Priya Singh. The dashboard shows evaluated notices, status filters, search, and deadlines. Notice details make the eligibility result prominent, show each requirement result and reason, and provide an action plan whose completion persists in the local store after reload.
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| GET | `/api/health` | — | Service health + DEMO_MODE flag |
+| GET | `/api/engine/status` | — | Python engine reachability check |
+| GET | `/api/notices` | student token | List published notices |
+| GET | `/api/notices/:id` | student token | Single notice |
+| POST | `/api/notices` | admin token | Create / extract notice (draft) |
+| PATCH | `/api/notices/:id` | admin token | Update fields / publish |
+| GET | `/api/students` | admin token | Selector list (safe fields only) |
+| GET | `/api/students/:id` | student token | Student profile |
+| POST | `/api/eligibility` | student token | Evaluate one student × one notice |
+| PATCH | `/api/eligibility/action-item` | student token | Mark action item complete |
 
-## 9. Admin experience
+Upload limit: 10 MB. Base64 content is validated before processing.
 
-Admin Notice Management supports upload or pasted text, local extraction, schema validation, review/editing, draft save, and explicit publish. Admin Impact Analysis evaluates a selected published notice across all demo students and shows the individual rows and exact aggregate counts.
+## 11. Student Experience
 
-Admin writes require `ADMIN_TOKEN`. Student-specific reads and action-item writes require a matching student ID and token from `STUDENT_TOKENS`. Student directory responses expose selector fields only.
+Students switch among the demo profiles **Rahul Sharma**, **Arjun Kumar**, and **Priya Singh** via the Topbar profile selector. The dashboard shows:
 
-## 10. Demo flow
+- Status filter tabs (All / Eligible / Not Eligible / Needs Info)
+- Live search with debounce
+- Deadline urgency badges (due tomorrow · urgent · approaching this week · N days remaining)
+- `NoticeCard` with expandable **"Why am I seeing this?"** breakdown
+- `NoticeDetailView` — full eligibility breakdown + persistent action plan
 
-1. Start the app with the example local environment.
-2. Open **Admin** and upload `sample-data/sample_notices/placement_drive.txt`, or paste a notice.
-3. Confirm the extraction label. In `DEMO_MODE`, it must say `DEMO_MODE fallback (not Strands execution)`; in configured real mode, it says `Extracted by local Strands agent`.
-4. Review or edit the structured fields, then save and publish.
-5. Switch to Rahul Sharma: the TCS demo notice is eligible.
-6. Switch to Arjun Kumar: the same notice is not eligible because Mechanical is not accepted.
-7. Switch to Priya Singh: the same notice needs information because active backlogs are missing.
-8. Open the notice detail, complete an action item, reload, and confirm it remains completed.
-9. Open **Admin Impact Analysis**. For the TCS criteria and the three demo profiles, the expected counts are 1 eligible, 1 not eligible, and 1 needs information.
+## 12. Admin Experience
 
-## 11. Build It architecture
+**Admin Notice Manager** supports: upload or pasted text → local extraction → closed-schema validation → review/edit of every field → draft save → explicit publish.
 
-This submission stays local by design. It uses React/Vite, Node/Express, local JSON persistence, a local Python process, local Strands/Ollama extraction when configured, and deterministic Python evaluation. It does not implement S3, DynamoDB, Bedrock, OpenSearch, Lambda, API Gateway, or any other Ship It cloud infrastructure. No AWS credentials are required.
+**Admin Impact Analysis** evaluates a selected published notice across all demo students and shows individual eligibility rows and aggregate counts.
 
-## 12. Limitations
+Admin writes require `ADMIN_TOKEN`. Student reads and action-item writes require a matching student ID and token from `STUDENT_TOKENS`. The student directory endpoint exposes selector fields only, never full profile data.
 
-- Real Strands mode requires Python dependencies, Ollama, and a locally pulled model; those are not bundled.
-- `DEMO_MODE` uses a small deterministic fallback and is not equivalent to an LLM extraction.
+## 13. Demo Flow
+
+1. Start with `npm run dev` using the example local environment.
+2. Open **Admin → Notice Manager**, upload `sample-data/sample_notices/placement_drive.txt` or paste any notice text.
+3. Confirm the extraction label:
+   - `DEMO_MODE` → **"DEMO_MODE fallback (not Strands execution)"**
+   - Real mode → **"Extracted by local Strands agent"**
+4. Review or edit the 17 structured fields, then save as draft and publish.
+5. Switch to **Rahul Sharma** — eligible (CSE, CGPA ≥ threshold, no backlogs).
+6. Switch to **Arjun Kumar** — not eligible (Mechanical branch not accepted).
+7. Switch to **Priya Singh** — needs information (active backlogs field missing).
+8. Open the notice detail, complete an action item, reload, and confirm it persists.
+9. Open **Admin → Impact Analysis** — expected counts: 1 eligible, 1 not eligible, 1 needs information.
+
+## 14. Build It Architecture Notes
+
+This submission stays local by design. It uses React/Vite, Node/Express, local JSON persistence, a local Python child process, and local Strands/Ollama extraction when configured. It does not implement S3, DynamoDB, Bedrock, OpenSearch, Lambda, API Gateway, or any other Ship It cloud infrastructure. No AWS credentials are required.
+
+## 15. Limitations
+
+- Real Strands mode requires Python dependencies, Ollama, and a locally pulled model — these are not bundled.
+- `DEMO_MODE` uses a small deterministic fallback and is not equivalent to LLM extraction.
 - Local JSON persistence is suitable for a demo, not concurrent production workloads.
 - The example token scheme is local demo authorization, not a production identity provider.
-- OCR requires a separately installed Tesseract binary on `PATH`.
-- The frontend has build/lint and live-flow verification, but no dedicated frontend unit-test script.
+- OCR requires Tesseract installed separately and available on `PATH`.
+- No dedicated frontend unit-test script; build and live-flow verification are the available frontend checks.
 
-## 13. Future improvements
+## 16. Future Improvements
 
 - Add a real identity and session system appropriate for deployment.
 - Replace JSON persistence with a transactional database if concurrency is needed.
-- Add broader fixture coverage for PDFs, OCR, schema edge cases, and UI automation.
-- Add audit history and review diffs for published notice changes.
+- Broader fixture coverage for PDFs, OCR, schema edge cases, and UI automation.
+- Audit history and review diffs for published notice changes.
 - Improve extraction confidence and human review assistance without moving eligibility decisions into the model.
 
-## Security and truthfulness notes
+## Security and Truthfulness Notes
 
-Uploaded files and pasted notices are untrusted. Uploads are limited to 10 MB, base64 is validated, structured output is closed-schema validated, model output is capped, and errors do not echo notice contents. URLs are validated but never fetched. The Python bridge uses `spawn` with argument arrays rather than a shell.
+Uploaded files and pasted notices are untrusted. Uploads are limited to 10 MB, base64 content is validated, structured output is closed-schema validated, model output is capped, and errors do not echo notice contents. URLs are validated but never fetched. The Python bridge uses `spawn` with argument arrays rather than a shell string — no shell injection.
 
-No API keys, passwords, private keys, or secret `.env` files belong in the repository. `.env` and `.env.local` are ignored; only non-secret `.env.example` templates are provided. The example tokens are placeholders for local demo use and must be replaced for any real deployment.
+No API keys, passwords, private keys, or secret `.env` files belong in the repository. `.env` and `.env.local` are gitignored; only non-secret `.env.example` templates are committed. The example tokens are placeholders for local demo use and must be replaced for any real deployment.
