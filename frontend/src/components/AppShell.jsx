@@ -5,6 +5,7 @@ import StudentDashboard from './StudentDashboard';
 import NoticeDetailView from './NoticeDetailView';
 import AdminNoticeManager from './AdminNoticeManager';
 import AdminImpactAnalysis from './AdminImpactAnalysis';
+import AdminDashboard from './AdminDashboard';
 import NoticeSearch from './NoticeSearch';
 import StatusBadge from './StatusBadge';
 import LoadingState from './LoadingState';
@@ -129,7 +130,7 @@ export const AppShell = () => {
     }
     switch (currentView) {
       case 'dashboard':
-        return 'Student Dashboard';
+        return currentProfile?.role === 'Admin' ? 'Admin Dashboard' : 'Student Dashboard';
       case 'notices':
         return 'Campus Notices Catalog';
       case 'profile':
@@ -147,7 +148,9 @@ export const AppShell = () => {
     }
     switch (currentView) {
       case 'dashboard':
-        return 'What do I need to act on today?';
+        return currentProfile?.role === 'Admin'
+          ? 'Notice-wise cohort eligibility intelligence & Excel student roster downloads'
+          : 'What do I need to act on today?';
       case 'notices':
         return 'All verified campus announcements with deterministic eligibility evaluation';
       case 'profile':
@@ -221,12 +224,24 @@ export const AppShell = () => {
             />
           )}
           {!profilesLoading && !profilesError && currentProfile && <>
-          {/* ================= VIEW 1: STUDENT DASHBOARD ================= */}
+          {/* ================= VIEW 1: DASHBOARD ================= */}
           {currentView === 'dashboard' && (
-            <StudentDashboard
-              studentProfile={currentProfile}
-              onNavigateNotice={navigateToNotice}
-            />
+            currentProfile.role === 'Admin' ? (
+              <AdminDashboard
+                onNavigate={(view, tab) => {
+                  if (tab) setAdminTab(tab);
+                  setSelectedNoticeId(null);
+                  setSelectedNoticeDetail(null);
+                  setCurrentView(view);
+                  window.history.pushState({}, '', `/${view}`);
+                }}
+              />
+            ) : (
+              <StudentDashboard
+                studentProfile={currentProfile}
+                onNavigateNotice={navigateToNotice}
+              />
+            )
           )}
 
           {/* ================= VIEW 2: NOTICE DETAIL (/student/notices/:id) ================= */}

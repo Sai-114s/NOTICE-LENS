@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { FileSpreadsheet } from 'lucide-react';
 import { getNoticeImpact, getPublishedNotices } from '../services/noticeService';
+import { downloadEligibleStudentsExcel } from '../utils/excelExport';
 import './AdminImpactAnalysis.css';
 
 const FILTERS = [
@@ -120,19 +122,47 @@ export default function AdminImpactAnalysis() {
 
       <div className="impact-engine-note">Eligibility calculated by deterministic NoticeLens rules engine.</div>
 
-      <div className="impact-filters" role="tablist" aria-label="Eligibility status filters">
-        {FILTERS.map((item) => (
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', margin: '16px 0' }}>
+        <div className="impact-filters" role="tablist" aria-label="Eligibility status filters" style={{ margin: 0 }}>
+          {FILTERS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={filter === item.id}
+              className={filter === item.id ? 'active' : ''}
+              onClick={() => setFilter(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {selectedNotice && (
           <button
-            key={item.id}
             type="button"
-            role="tab"
-            aria-selected={filter === item.id}
-            className={filter === item.id ? 'active' : ''}
-            onClick={() => setFilter(item.id)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#059669',
+              color: '#FFFFFF',
+              fontSize: '13px',
+              fontWeight: 600,
+              padding: '8px 16px',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: counts.eligible > 0 ? 'pointer' : 'not-allowed',
+              opacity: counts.eligible > 0 ? 1 : 0.6
+            }}
+            onClick={() => downloadEligibleStudentsExcel(selectedNotice, results, 'eligible')}
+            disabled={counts.eligible === 0}
+            title="Download Excel spreadsheet of eligible students"
           >
-            {item.label}
+            <FileSpreadsheet size={15} />
+            <span>Download Eligible Students Excel ({counts.eligible})</span>
           </button>
-        ))}
+        )}
       </div>
 
       <div className="impact-table-wrap">

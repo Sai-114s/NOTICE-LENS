@@ -38,10 +38,13 @@ async function getNoticeImpact(req, res, next) {
                     ? (evaluated.engineAudit.missing_information?.[0] || 'Additional student information required')
                     : (evaluated.engineAudit.reasons?.[0] || 'One or more requirements not met');
             return {
+                studentId: student.id,
                 student: student.name,
                 branch: student.branch || null,
                 year: student.year ?? null,
                 cgpa: student.cgpa ?? null,
+                active_backlogs: student.active_backlogs ?? null,
+                degree: student.degree || null,
                 status,
                 reason
             };
